@@ -1,4 +1,4 @@
-package com.devicehive.messages.converter;
+package com.devicehive.message.converter;
 
 import com.devicehive.domain.DeviceNotification;
 import com.google.gson.Gson;

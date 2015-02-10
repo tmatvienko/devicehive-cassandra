@@ -1,12 +1,12 @@
-package com.devicehive.messages;
+package com.devicehive.message;
 
 import com.devicehive.domain.DeviceNotification;
-import com.devicehive.repository.DeviceNotificationRepository;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class MessageConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageConsumer.class);
 
     @Autowired
-    private DeviceNotificationRepository notificationRepository;
+    private CassandraOperations cassandraTemplate;
 
     @Async
     public void subscribe(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
@@ -27,7 +27,7 @@ public class MessageConsumer {
         while (it.hasNext()) {
             DeviceNotification message = it.next().message();
             LOGGER.debug("{}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
-            notificationRepository.save(message);
+            cassandraTemplate.insertAsynchronously(message);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);
     }
