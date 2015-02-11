@@ -28,12 +28,13 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
         final DeviceNotification notif2 = new DeviceNotification(UUIDs.timeBased(), "notification2", deviceGuid, date, null);
         notificationRepository.save(ImmutableSet.of(notif1, notif2));
 
-        Iterable<DeviceNotification> notifications = notificationRepository.findByDeviceGuidAndTimestamp(deviceGuid, date);
+        Iterable<DeviceNotification> notifications = notificationRepository.findByDeviceGuid(deviceGuid);
 
         DeviceNotification notification = notificationRepository.findById(id);
 
         assertThat(notifications, hasItem(notif1));
         assertThat(notifications, hasItem(notif2));
+        assertThat(notifications, hasItem(notification));
     }
 
     @Test
@@ -45,7 +46,7 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
         notificationRepository.delete(notif1);
         notificationRepository.delete(notif2);
 
-        Iterable<DeviceNotification> notifications = notificationRepository.findByDeviceGuidAndTimestamp(deviceGuid, date);
+        Iterable<DeviceNotification> notifications = notificationRepository.findByDeviceGuid(deviceGuid);
 
         assertThat(notifications, not(hasItem(notif1)));
         assertThat(notifications, not(hasItem(notif2)));

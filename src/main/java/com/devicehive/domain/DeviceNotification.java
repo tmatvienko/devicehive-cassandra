@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.springframework.cassandra.core.Ordering;
 import org.springframework.cassandra.core.PrimaryKeyType;
 import org.springframework.data.cassandra.mapping.Column;
+import org.springframework.data.cassandra.mapping.Indexed;
 import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.mapping.Table;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Table(value = "device_notification")
 public class DeviceNotification implements Serializable {
 
-    @PrimaryKeyColumn(name = "id", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+    @PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     @SerializedName("id")
     private final UUID id;
 
@@ -25,7 +26,8 @@ public class DeviceNotification implements Serializable {
     @SerializedName("device_guid")
     private final String deviceGuid;
 
-    @PrimaryKeyColumn(name = "timestamp", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+    @Column
+    @Indexed(value = "timestamp_idx")
     @SerializedName("timestamp")
     private final Date timestamp;
 

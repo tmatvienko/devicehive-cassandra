@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.cql.CqlIdentifier;
+import org.springframework.cassandra.core.keyspace.CreateKeyspaceSpecification;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -29,7 +30,9 @@ import org.springframework.data.cassandra.mapping.CassandraMappingContext;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by tmatvienko on 2/5/15.
@@ -50,6 +53,11 @@ public class ClusterConfiguration extends AbstractCassandraConfiguration impleme
         final String contactPoints = clusterConfig.getCassandraContactpoints();
         final CassandraClusterFactoryBean cluster = new CassandraClusterFactoryBean();
         cluster.setContactPoints(contactPoints);
+        List<CreateKeyspaceSpecification> createKeyspaceSpecifications = Arrays.asList(
+                new CreateKeyspaceSpecification(environment.getProperty(Constants.CASSANDRA_KEYSPACE)).ifNotExists(),
+                new CreateKeyspaceSpecification(environment.getProperty(Constants.CASSANDRA_KEYSPACE_TEST)).ifNotExists()
+        );
+        cluster.setKeyspaceCreations(createKeyspaceSpecifications);
         LOGGER.info("Cassandra cluster started on {}", contactPoints);
         return cluster;
     }

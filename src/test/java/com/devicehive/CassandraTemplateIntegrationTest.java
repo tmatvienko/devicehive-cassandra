@@ -35,8 +35,7 @@ public class CassandraTemplateIntegrationTest extends BaseIntegrationTest {
         final DeviceNotification notif = new DeviceNotification(UUIDs.timeBased(), "notification1", deviceGuid, date, null);
         cassandraTemplate.insert(notif);
 
-        Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("timestamp", date))
-                .and(QueryBuilder.eq("device_guid", deviceGuid)).limit(10);
+        Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid", deviceGuid)).limit(10);
 
         DeviceNotification retrievedNotification = cassandraTemplate.selectOne(select, DeviceNotification.class);
         assertThat(retrievedNotification, IsEqual.equalTo(notif));

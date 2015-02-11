@@ -5,5 +5,5 @@ package com.devicehive.utils.messages;
  */
 public class Messages {
     public static final String WRONG_CONFIG = "Wrong or empty configuration was found during startup: %s";
-    public static final String GET_EXECUTION_ERROR = "Exception has been caught during GET request execution";
+    public static final String GET_EXECUTION_ERROR = "Exception has been caught during GET request execution to DH API";
 }

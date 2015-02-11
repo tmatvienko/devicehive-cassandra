@@ -31,13 +31,12 @@ public class CqlTemplateIntegrationTest extends BaseIntegrationTest {
         insertEventUsingStatementBuildWithQueryBuilder();
         insertEventUsingPreparedStatement();
 
-        ResultSet resultSet1 = cqlTemplate.query("select * from device_notification where device_guid='" + deviceGuid + "' and timestamp='"
-                + date.getTime() + "'");
+        ResultSet resultSet1 = cqlTemplate.query("select * from device_notification where device_guid='" + deviceGuid + "'");
 
         assertThat(resultSet1.all().size(), Is.is(2));
 
         Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid", deviceGuid2))
-                .and(QueryBuilder.eq("timestamp", date)).limit(10);
+                .limit(10);
         ResultSet resultSet2 = cqlTemplate.query(select);
 
         assertThat(resultSet2.all().size(), Is.is(1));
