@@ -26,7 +26,7 @@ public class MessageConsumer {
         ConsumerIterator<String, DeviceNotification> it = a_stream.iterator();
         while (it.hasNext()) {
             DeviceNotification message = it.next().message();
-            LOGGER.debug("{}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
+            LOGGER.info("{}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
             cassandraTemplate.insertAsynchronously(message);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);

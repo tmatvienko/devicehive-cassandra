@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 /**
  * Created by tmatvienko on 2/5/15.
  */
@@ -16,6 +18,7 @@ public class AppInfoController {
     public AppInfo getAppInfo() {
         AppInfo appInfo = new AppInfo();
         appInfo.setAppVersion("1.0.0");
+        appInfo.setServerDate(new Date());
         return appInfo;
     }
 }

@@ -24,8 +24,8 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
     @Test
     public void repositoryStoresAndRetrievesEvents() {
         final UUID id = UUIDs.timeBased();
-        final DeviceNotification notif1 = new DeviceNotification(id, "notification1", deviceGuid, date, null);
-        final DeviceNotification notif2 = new DeviceNotification(UUIDs.timeBased(), "notification2", deviceGuid, date, null);
+        final DeviceNotification notif1 = new DeviceNotification(id, deviceGuid, date, "notification1", null);
+        final DeviceNotification notif2 = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification2", null);
         notificationRepository.save(ImmutableSet.of(notif1, notif2));
 
         Iterable<DeviceNotification> notifications = notificationRepository.findByDeviceGuid(deviceGuid);
@@ -39,8 +39,8 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void repositoryDeletesStoredEvents() {
-        final DeviceNotification notif1 = new DeviceNotification(UUIDs.timeBased(), "notification1", deviceGuid, date, null);
-        final DeviceNotification notif2 = new DeviceNotification(UUIDs.timeBased(), "notification1", deviceGuid, date, null);
+        final DeviceNotification notif1 = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification1", null);
+        final DeviceNotification notif2 = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification1", null);
         notificationRepository.save(ImmutableSet.of(notif1, notif2));
 
         notificationRepository.delete(notif1);

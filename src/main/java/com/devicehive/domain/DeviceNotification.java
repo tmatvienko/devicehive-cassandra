@@ -39,11 +39,11 @@ public class DeviceNotification implements Serializable {
     @SerializedName("parameters")
     private final String parameters;
 
-    public DeviceNotification(UUID id, String notification, String deviceGuid, Date timestamp, String parameters) {
+    public DeviceNotification(UUID id, String deviceGuid, Date timestamp, String notification, String parameters) {
         this.id = id;
-        this.notification = notification;
         this.deviceGuid = deviceGuid;
         this.timestamp = timestamp;
+        this.notification = notification;
         this.parameters= parameters;
     }
 

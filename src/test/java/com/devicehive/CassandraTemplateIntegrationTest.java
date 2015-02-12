@@ -32,7 +32,7 @@ public class CassandraTemplateIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void supportsPojoToCqlMappings() {
-        final DeviceNotification notif = new DeviceNotification(UUIDs.timeBased(), "notification1", deviceGuid, date, null);
+        final DeviceNotification notif = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification1", null);
         cassandraTemplate.insert(notif);
 
         Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid", deviceGuid)).limit(10);
