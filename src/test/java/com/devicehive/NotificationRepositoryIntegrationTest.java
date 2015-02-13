@@ -51,4 +51,16 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
         assertThat(notifications, not(hasItem(notif1)));
         assertThat(notifications, not(hasItem(notif2)));
     }
+
+    @Test
+    public void repositoryStoresAndRetrievesEventsByDate() {
+        final DeviceNotification notif1 = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification1", null);
+        final DeviceNotification notif2 = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification1", null);
+        notificationRepository.save(ImmutableSet.of(notif1, notif2));
+
+        Iterable<DeviceNotification> notifications = notificationRepository.findByTimestamp(date);
+
+        assertThat(notifications, hasItem(notif1));
+        assertThat(notifications, hasItem(notif2));
+    }
 }

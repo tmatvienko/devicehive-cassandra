@@ -3,7 +3,8 @@ package com.devicehive.service;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.devicehive.domain.DeviceNotification;
-import com.devicehive.utils.NotificationRowMapper;
+import com.devicehive.repository.DeviceNotificationRepository;
+import com.devicehive.utils.mappers.NotificationRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ public class DeviceNotificationService {
 
     @Autowired
     private CqlOperations cqlTemplate;
+    @Autowired
+    private DeviceNotificationRepository notificationRepository;
 
     public List<DeviceNotification> getLast(Integer count) {
         Select select = QueryBuilder.select().from("device_notification").limit(count);
@@ -33,5 +36,9 @@ public class DeviceNotificationService {
         Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid",
                 deviceGuid)).limit(count);
         return cqlTemplate.query(select, new NotificationRowMapper());
+    }
+
+    public Long getNotificationsCount() {
+        return notificationRepository.count();
     }
 }

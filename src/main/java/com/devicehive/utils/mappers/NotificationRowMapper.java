@@ -1,4 +1,4 @@
-package com.devicehive.utils;
+package com.devicehive.utils.mappers;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.exceptions.DriverException;

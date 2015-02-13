@@ -3,8 +3,6 @@ package com.devicehive.domain;
 import com.google.gson.annotations.SerializedName;
 import org.springframework.cassandra.core.Ordering;
 import org.springframework.cassandra.core.PrimaryKeyType;
-import org.springframework.data.cassandra.mapping.Column;
-import org.springframework.data.cassandra.mapping.Indexed;
 import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.mapping.Table;
 
@@ -26,16 +24,12 @@ public class DeviceNotification implements Serializable {
     @SerializedName("device_guid")
     private final String deviceGuid;
 
-    @Column
-    @Indexed(value = "timestamp_idx")
     @SerializedName("timestamp")
     private final Date timestamp;
 
-    @Column
     @SerializedName("notification")
     private final String notification;
 
-    @Column
     @SerializedName("parameters")
     private final String parameters;
 

@@ -1,6 +1,7 @@
 package com.devicehive.connect;
 
 import com.devicehive.domain.ClusterConfig;
+import com.devicehive.domain.DeviceCommand;
 import com.devicehive.domain.DeviceNotification;
 import com.devicehive.exception.HiveException;
 import com.devicehive.utils.Constants;
@@ -76,6 +77,8 @@ public class ClusterConfiguration extends AbstractCassandraConfiguration impleme
     public CassandraAdminOperations cassandraTemplate() throws Exception {
         CassandraAdminOperations adminTemplate = new CassandraAdminTemplate(this.session().getObject(), this.cassandraConverter());
         adminTemplate.createTable(true, CqlIdentifier.cqlId("device_notification"), DeviceNotification.class,
+                new HashMap<String, Object>());
+        adminTemplate.createTable(true, CqlIdentifier.cqlId("device_command"), DeviceCommand.class,
                 new HashMap<String, Object>());
         return adminTemplate;
     }

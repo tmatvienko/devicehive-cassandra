@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -13,12 +14,11 @@ import java.util.Date;
 @RestController
 @RequestMapping("/info")
 public class AppInfoController {
+    private static final AppInfo APP_INFO = new AppInfo("1.0.0",
+            new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z").format(new Date()));
 
     @RequestMapping(value = "/version", method = RequestMethod.GET, headers = "Accept=application/json")
     public AppInfo getAppInfo() {
-        AppInfo appInfo = new AppInfo();
-        appInfo.setAppVersion("1.0.0");
-        appInfo.setServerDate(new Date());
-        return appInfo;
+        return APP_INFO;
     }
 }

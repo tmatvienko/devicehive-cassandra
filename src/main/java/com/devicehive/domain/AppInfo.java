@@ -1,13 +1,16 @@
 package com.devicehive.domain;
 
-import java.util.Date;
-
 /**
  * Created by tmatvienko on 2/5/15.
  */
 public class AppInfo {
     private String appVersion;
-    private Date serverDate;
+    private String serverDate;
+
+    public AppInfo(String appVersion, String serverDate) {
+        this.appVersion = appVersion;
+        this.serverDate = serverDate;
+    }
 
     public String getAppVersion() {
         return appVersion;
@@ -17,11 +20,11 @@ public class AppInfo {
         this.appVersion = appVersion;
     }
 
-    public Date getServerDate() {
+    public String getServerDate() {
         return serverDate;
     }
 
-    public void setServerDate(Date serverDate) {
+    public void setServerDate(String serverDate) {
         this.serverDate = serverDate;
     }
 }

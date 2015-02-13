@@ -26,4 +26,9 @@ public class DeviceNotificationController {
     public List<DeviceNotification> getByDevice(@PathVariable String deviceGuid, @RequestParam(value = "count", required=false, defaultValue = "1000") int count) {
         return notificationService.getByDevice(deviceGuid, count);
     }
+
+    @RequestMapping(value="/count",method = RequestMethod.GET, produces = "application/json")
+    public Long getNotificationsCount() {
+        return notificationService.getNotificationsCount();
+    }
 }
