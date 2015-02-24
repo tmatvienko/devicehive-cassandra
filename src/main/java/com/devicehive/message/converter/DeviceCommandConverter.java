@@ -1,6 +1,7 @@
 package com.devicehive.message.converter;
 
 import com.devicehive.domain.DeviceCommand;
+import com.devicehive.domain.wrappers.DeviceCommandWrapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import kafka.serializer.Decoder;
@@ -12,16 +13,16 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by tmatvienko on 2/13/15.
  */
-public class DeviceCommandConverter implements Encoder<DeviceCommand>, Decoder<DeviceCommand> {
+public class DeviceCommandConverter implements Encoder<DeviceCommand>, Decoder<DeviceCommandWrapper> {
     private Gson gson;
     public DeviceCommandConverter(VerifiableProperties verifiableProperties) {
         gson = new GsonBuilder().disableHtmlEscaping().create();
     }
 
     @Override
-    public DeviceCommand fromBytes(byte[] bytes) {
+    public DeviceCommandWrapper fromBytes(byte[] bytes) {
         try {
-            return gson.fromJson(new String(bytes, "UTF-8"), DeviceCommand.class);
+            return gson.fromJson(new String(bytes, "UTF-8"), DeviceCommandWrapper.class);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

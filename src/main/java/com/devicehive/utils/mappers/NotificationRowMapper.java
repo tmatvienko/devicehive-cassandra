@@ -12,7 +12,7 @@ public class NotificationRowMapper implements RowMapper<DeviceNotification> {
 
     @Override
     public DeviceNotification mapRow(Row row, int i) throws DriverException {
-        return new DeviceNotification(row.getUUID("id"), row.getString("device_guid"),
+        return new DeviceNotification(row.getString("id"), row.getString("device_guid"),
                 row.getDate("timestamp"), row.getString("notification"), row.getString("parameters"));
     }
 }

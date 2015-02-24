@@ -5,6 +5,7 @@ import com.devicehive.service.DeviceNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,5 +31,10 @@ public class DeviceNotificationController {
     @RequestMapping(value="/count",method = RequestMethod.GET, produces = "application/json")
     public Long getNotificationsCount() {
         return notificationService.getNotificationsCount();
+    }
+
+    @RequestMapping(value="/new",method = RequestMethod.GET, produces = "application/json")
+    public List<DeviceNotification> getNewNotifications(@RequestParam(value = "timestamp", required=true) Date timestamp) {
+        return notificationService.getNewNotifications(timestamp);
     }
 }

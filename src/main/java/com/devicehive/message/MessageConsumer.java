@@ -2,6 +2,8 @@ package com.devicehive.message;
 
 import com.devicehive.domain.DeviceCommand;
 import com.devicehive.domain.DeviceNotification;
+import com.devicehive.domain.wrappers.DeviceCommandWrapper;
+import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import org.slf4j.Logger;
@@ -24,11 +26,12 @@ public class MessageConsumer {
     @Async
     public void subscribeOnNotifications(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
         LOGGER.info("{}: Kafka device notifications consumer started... {} ", Thread.currentThread().getName(), a_threadNumber);
-        ConsumerIterator<String, DeviceNotification> it = a_stream.iterator();
+        ConsumerIterator<String, DeviceNotificationWrapper> it = a_stream.iterator();
         while (it.hasNext()) {
-            DeviceNotification message = it.next().message();
-            LOGGER.info("Notification {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
-            cassandraTemplate.insertAsynchronously(message);
+            DeviceNotificationWrapper message = it.next().message();
+            LOGGER.debug("Notification {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
+            DeviceNotification notification = new DeviceNotification(message);
+            cassandraTemplate.insertAsynchronously(notification);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);
     }
@@ -36,11 +39,12 @@ public class MessageConsumer {
     @Async
     public void subscribeOnCommands(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
         LOGGER.info("{}: Kafka device commands consumer started... {} ", Thread.currentThread().getName(), a_threadNumber);
-        ConsumerIterator<String, DeviceCommand> it = a_stream.iterator();
+        ConsumerIterator<String, DeviceCommandWrapper> it = a_stream.iterator();
         while (it.hasNext()) {
-            DeviceCommand message = it.next().message();
-            LOGGER.info("Command {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
-            cassandraTemplate.insert(message);
+            DeviceCommandWrapper message = it.next().message();
+            LOGGER.debug("Command {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
+            DeviceCommand command = new DeviceCommand(message);
+            cassandraTemplate.insert(command);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);
     }
@@ -48,11 +52,12 @@ public class MessageConsumer {
     @Async
     public void subscribeOnCommandsUpdate(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
         LOGGER.info("{}: Kafka device commands update consumer started... {} ", Thread.currentThread().getName(), a_threadNumber);
-        ConsumerIterator<String, DeviceCommand> it = a_stream.iterator();
+        ConsumerIterator<String, DeviceCommandWrapper> it = a_stream.iterator();
         while (it.hasNext()) {
-            DeviceCommand message = it.next().message();
-            LOGGER.info("CommandUpdate {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
-            cassandraTemplate.updateAsynchronously(message);
+            DeviceCommandWrapper message = it.next().message();
+            LOGGER.debug("CommandUpdate {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
+            DeviceCommand command = new DeviceCommand(message);
+            cassandraTemplate.updateAsynchronously(command);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);
     }

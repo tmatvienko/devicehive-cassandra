@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,5 +42,9 @@ public class DeviceNotificationService {
 
     public Long getNotificationsCount() {
         return notificationRepository.count();
+    }
+
+    public List<DeviceNotification> getNewNotifications(Date date) {
+        return (List<DeviceNotification>) notificationRepository.findByTimestamp(date);
     }
 }

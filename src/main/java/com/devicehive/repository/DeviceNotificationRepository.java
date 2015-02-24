@@ -5,7 +5,6 @@ import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by tmatvienko on 2/5/15.
@@ -15,9 +14,9 @@ public interface DeviceNotificationRepository extends CassandraRepository<Device
     @Query("select * from device_notification where device_guid = ?0")
     Iterable<DeviceNotification> findByDeviceGuid(String deviceGuid);
 
-    @Query("select * from device_notification where id >= minTimeuuid(?0) ALLOW FILTERING")
+    @Query("select * from device_notification where timestamp <= ?0 ALLOW FILTERING")
     Iterable<DeviceNotification> findByTimestamp(Date timestamp);
 
-    @Query("select * from device_notification where id = ?0 ALLOW FILTERING")
-    DeviceNotification findById(UUID id);
+    @Query("select * from device_notification where timestamp >= ?0 and timestamp <= ?1 ALLOW FILTERING")
+    Iterable<DeviceNotification> findInPeriod(Date start, Date end);
 }

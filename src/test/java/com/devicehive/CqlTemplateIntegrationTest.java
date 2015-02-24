@@ -44,19 +44,19 @@ public class CqlTemplateIntegrationTest extends BaseIntegrationTest {
     }
 
     private void insertEventUsingCqlString() {
-        cqlTemplate.execute("insert into device_notification (id, notification, device_guid, timestamp) values (" +
-                UUIDs.timeBased() + ", 'notification', '" + deviceGuid + "', '" + date.getTime() + "')");
+        cqlTemplate.execute("insert into device_notification (id, notification, device_guid, timestamp) values ('" +
+                String.valueOf(UUIDs.timeBased().timestamp()) + "', 'notification', '" + deviceGuid + "', '" + date.getTime() + "')");
     }
 
     private void insertEventUsingStatementBuildWithQueryBuilder() {
-        Insert insertStatement = QueryBuilder.insertInto("device_notification").value("id", UUIDs.timeBased()).value("notification", "notification")
+        Insert insertStatement = QueryBuilder.insertInto("device_notification").value("id", String.valueOf(UUIDs.timeBased().timestamp())).value("notification", "notification")
                 .value("device_guid", deviceGuid).value("timestamp", date);
         cqlTemplate.execute(insertStatement);
     }
 
     private void insertEventUsingPreparedStatement() {
         PreparedStatement preparedStatement = cqlTemplate.getSession().prepare("insert into device_notification (id, notification, device_guid, timestamp) values (?, ?, ?, ?)");
-        Statement insertStatement = preparedStatement.bind(UUIDs.timeBased(), "notification", deviceGuid2, date);
+        Statement insertStatement = preparedStatement.bind(String.valueOf(UUIDs.timeBased().timestamp()), "notification", deviceGuid2, date);
         cqlTemplate.execute(insertStatement);
     }
 }

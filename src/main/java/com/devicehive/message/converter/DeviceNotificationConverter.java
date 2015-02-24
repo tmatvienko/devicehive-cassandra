@@ -1,6 +1,7 @@
 package com.devicehive.message.converter;
 
 import com.devicehive.domain.DeviceNotification;
+import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import kafka.serializer.Decoder;
@@ -12,16 +13,16 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by tmatvienko on 2/5/15.
  */
-public class DeviceNotificationConverter implements Encoder<DeviceNotification>, Decoder<DeviceNotification> {
+public class DeviceNotificationConverter implements Encoder<DeviceNotification>, Decoder<DeviceNotificationWrapper> {
     private Gson gson;
     public DeviceNotificationConverter(VerifiableProperties verifiableProperties) {
         gson = new GsonBuilder().disableHtmlEscaping().create();
     }
 
     @Override
-    public DeviceNotification fromBytes(byte[] bytes) {
+    public DeviceNotificationWrapper fromBytes(byte[] bytes) {
         try {
-            return gson.fromJson(new String(bytes, "UTF-8"), DeviceNotification.class);
+            return gson.fromJson(new String(bytes, "UTF-8"), DeviceNotificationWrapper.class);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

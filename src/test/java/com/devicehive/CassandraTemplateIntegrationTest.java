@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraOperations;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,12 +27,12 @@ public class CassandraTemplateIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private CassandraOperations cassandraTemplate;
 
-    final private Date date = new Date();
+    final private Timestamp date = new Timestamp(System.currentTimeMillis());
     final private String deviceGuid = UUID.randomUUID().toString();
 
     @Test
     public void supportsPojoToCqlMappings() {
-        final DeviceNotification notif = new DeviceNotification(UUIDs.timeBased(), deviceGuid, date, "notification1", null);
+        final DeviceNotification notif = new DeviceNotification(String.valueOf(UUIDs.timeBased().timestamp()), deviceGuid, date, "notification1", null);
         cassandraTemplate.insert(notif);
 
         Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid", deviceGuid)).limit(10);

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,5 +52,9 @@ public class DeviceCommandsService {
         Delete delete = QueryBuilder.delete().from("device_command").where(QueryBuilder.eq("device_guid",
                 deviceGuid)).ifExists();
         cqlTemplate.execute(delete);
+    }
+
+    public List<DeviceCommand> getNewCommands(Date date) {
+        return (List<DeviceCommand>) commandRepository.findByTimestamp(date);
     }
 }

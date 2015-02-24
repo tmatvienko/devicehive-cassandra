@@ -5,6 +5,9 @@ import com.devicehive.service.DeviceCommandsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,6 +19,8 @@ public class DeviceCommandController {
 
     @Autowired
     private DeviceCommandsService commandsService;
+
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     @RequestMapping(value="/all", method = RequestMethod.GET, produces = "application/json")
     public List<DeviceCommand> getLast(@RequestParam(value = "count", required=false, defaultValue = "1000") int count) {
@@ -40,5 +45,11 @@ public class DeviceCommandController {
     @RequestMapping(value="/{deviceGuid}", method = RequestMethod.DELETE, produces = "application/json")
     public void deleteByDeviceGuid(@PathVariable String deviceGuid) {
         commandsService.deleteByDeviceGuid(deviceGuid);
+    }
+
+    @RequestMapping(value="/new",method = RequestMethod.GET, produces = "application/json")
+    public List<DeviceCommand> getNewNotifications(@RequestParam(value = "timestamp", required=true) String timestamp) throws ParseException {
+        final Date date = FORMAT.parse(timestamp);
+        return commandsService.getNewCommands(date);
     }
 }

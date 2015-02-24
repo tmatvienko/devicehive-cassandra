@@ -1,60 +1,37 @@
-package com.devicehive.domain;
+package com.devicehive.domain.wrappers;
 
-import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
-import org.springframework.cassandra.core.Ordering;
-import org.springframework.cassandra.core.PrimaryKeyType;
-import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
-import org.springframework.data.cassandra.mapping.Table;
+import com.devicehive.domain.JsonStringWrapper;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by tmatvienko on 2/5/15.
+ * Created by tmatvienko on 2/24/15.
  */
-@Table(value = "device_notification")
-public class DeviceNotification implements Serializable {
+public class DeviceNotificationWrapper implements Serializable {
 
-    @PrimaryKeyColumn(name = "id", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
-    private String id;
+    @SerializedName("id")
+    private final String id;
 
-    @PrimaryKeyColumn(name = "device_guid", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-    private String deviceGuid;
+    @SerializedName("device_guid")
+    private final String deviceGuid;
 
-    @PrimaryKeyColumn(name = "timestamp", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
-    private Date timestamp;
+    @SerializedName("timestamp")
+    private final Date timestamp;
 
-    private String notification;
+    @SerializedName("notification")
+    private final String notification;
 
-    private String parameters;
+    @SerializedName("parameters")
+    private final JsonStringWrapper parameters;
 
-    public DeviceNotification() {
-    }
-
-    public DeviceNotification(String id, String deviceGuid, Date timestamp, String notification, String parameters) {
+    public DeviceNotificationWrapper(String id, String deviceGuid, Date timestamp, String notification, JsonStringWrapper parameters) {
         this.id = id;
         this.deviceGuid = deviceGuid;
         this.timestamp = timestamp;
         this.notification = notification;
         this.parameters= parameters;
-    }
-
-    public DeviceNotification(DeviceNotificationWrapper wrapper) {
-        if (wrapper.getId() != null) {
-            this.id = wrapper.getId();
-        }
-        if (wrapper.getDeviceGuid() != null) {
-            this.deviceGuid = wrapper.getDeviceGuid();
-        }
-        if (wrapper.getTimestamp() != null) {
-            this.timestamp = wrapper.getTimestamp();
-        }
-        if (wrapper.getNotification() != null) {
-            this.notification = wrapper.getNotification();
-        }
-        if (wrapper.getParameters() != null) {
-            this.parameters = wrapper.getParameters().getJsonString();
-        }
     }
 
     public String getId() {
@@ -73,7 +50,7 @@ public class DeviceNotification implements Serializable {
         return timestamp;
     }
 
-    public String getParameters() {
+    public JsonStringWrapper getParameters() {
         return parameters;
     }
 
@@ -82,7 +59,7 @@ public class DeviceNotification implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DeviceNotification that = (DeviceNotification) o;
+        DeviceNotificationWrapper that = (DeviceNotificationWrapper) o;
 
         if (deviceGuid != null ? !deviceGuid.equals(that.deviceGuid) : that.deviceGuid != null) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
@@ -105,7 +82,7 @@ public class DeviceNotification implements Serializable {
 
     @Override
     public String toString() {
-        return "DeviceNotification{" +
+        return "DeviceNotificationWrapper{" +
                 "id=" + id +
                 ", notification='" + notification + '\'' +
                 ", deviceGuid=" + deviceGuid +

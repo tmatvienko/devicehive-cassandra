@@ -2,8 +2,9 @@ package com.devicehive.message;
 
 import com.devicehive.connect.ClusterConfiguration;
 import com.devicehive.domain.ClusterConfig;
-import com.devicehive.domain.DeviceCommand;
+import com.devicehive.domain.wrappers.DeviceCommandWrapper;
 import com.devicehive.domain.DeviceNotification;
+import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
 import com.devicehive.message.converter.DeviceCommandConverter;
 import com.devicehive.message.converter.DeviceNotificationConverter;
 import kafka.consumer.Consumer;
@@ -83,25 +84,25 @@ public class MessageConsumerGroup implements InitializingBean, DisposableBean {
         Map<String, Integer> commandUpdateTopicCountMap = new HashMap();
         commandUpdateTopicCountMap.put(environment.getProperty(COMMAND_UPDATE_TOPIC_NAME), threadsCount);
 
-        Map<String, List<KafkaStream<String, DeviceNotification>>> notificationStreams = notificationConnector.createMessageStreams(
+        Map<String, List<KafkaStream<String, DeviceNotificationWrapper>>> notificationStreams = notificationConnector.createMessageStreams(
                 notificationTopicCountMap, new StringDecoder(new VerifiableProperties()),
                 new DeviceNotificationConverter(new VerifiableProperties()));
 
-        Map<String, List<KafkaStream<String, DeviceCommand>>> commandStreams = commandConnector.createMessageStreams(
+        Map<String, List<KafkaStream<String, DeviceCommandWrapper>>> commandStreams = commandConnector.createMessageStreams(
                 commandTopicCountMap, new StringDecoder(new VerifiableProperties()),
                 new DeviceCommandConverter(new VerifiableProperties()));
 
-        Map<String, List<KafkaStream<String, DeviceCommand>>> commandUpdateStreams = commandUpdateConnector.createMessageStreams(
+        Map<String, List<KafkaStream<String, DeviceCommandWrapper>>> commandUpdateStreams = commandUpdateConnector.createMessageStreams(
                 commandUpdateTopicCountMap, new StringDecoder(new VerifiableProperties()),
                 new DeviceCommandConverter(new VerifiableProperties()));
 
-        List<KafkaStream<String, DeviceNotification>> notificationStream = notificationStreams.get(
+        List<KafkaStream<String, DeviceNotificationWrapper>> notificationStream = notificationStreams.get(
                 environment.getProperty(NOTIFICATION_TOPIC_NAME));
 
-        List<KafkaStream<String, DeviceCommand>> commandStream = commandStreams.get(
+        List<KafkaStream<String, DeviceCommandWrapper>> commandStream = commandStreams.get(
                 environment.getProperty(COMMAND_TOPIC_NAME));
 
-        List<KafkaStream<String, DeviceCommand>> commandUpdateStream = commandUpdateStreams.get(
+        List<KafkaStream<String, DeviceCommandWrapper>> commandUpdateStream = commandUpdateStreams.get(
                 environment.getProperty(COMMAND_UPDATE_TOPIC_NAME));
 
         int threadNumber = 0;

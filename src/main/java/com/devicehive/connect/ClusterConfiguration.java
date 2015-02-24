@@ -44,7 +44,7 @@ import java.util.List;
 public class ClusterConfiguration extends AbstractCassandraConfiguration implements InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClusterConfiguration.class);
 
-    private ClusterConfig clusterConfig;
+    protected ClusterConfig clusterConfig;
 
     @Autowired
     protected Environment environment;

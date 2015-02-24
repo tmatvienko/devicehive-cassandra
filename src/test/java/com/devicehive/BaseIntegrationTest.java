@@ -1,7 +1,6 @@
 package com.devicehive;
 
 import com.devicehive.connect.TestCassandraConfiguration;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +23,6 @@ public class BaseIntegrationTest {
 
     @Autowired
     private CassandraAdminOperations adminTemplate;
-
-    @Before
-    public void resetKeySpace() {
-        //adminTemplate.createTable(true, CqlIdentifier.cqlId("device_notification"), DeviceNotification.class, new HashMap<String, Object>());
-        //adminTemplate.deleteAll(DeviceNotification.class);
-    }
 
     @Test
     public void test() {}
