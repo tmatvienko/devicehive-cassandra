@@ -20,6 +20,7 @@ public class BaseIntegrationTest {
     final Date date = new Date();
     final String deviceGuid = UUID.randomUUID().toString();
     final String deviceGuid2 = UUID.randomUUID().toString();
+    final String deviceGuid3 = UUID.randomUUID().toString();
 
     @Autowired
     private CassandraAdminOperations adminTemplate;

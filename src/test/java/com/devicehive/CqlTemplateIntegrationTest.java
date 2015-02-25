@@ -31,16 +31,20 @@ public class CqlTemplateIntegrationTest extends BaseIntegrationTest {
         insertEventUsingStatementBuildWithQueryBuilder();
         insertEventUsingPreparedStatement();
 
-        ResultSet resultSet1 = cqlTemplate.query("select * from device_notification where device_guid='" + deviceGuid + "'");
+        ResultSet resultSet = cqlTemplate.query("select * from device_notification where device_guid='" + deviceGuid + "'");
 
-        assertThat(resultSet1.all().size(), Is.is(2));
+        assertThat(resultSet.all().size(), Is.is(1));
 
-        Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid", deviceGuid2))
+        Select select1 = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid", deviceGuid2))
                 .limit(10);
-        ResultSet resultSet2 = cqlTemplate.query(select);
+        ResultSet resultSet1 = cqlTemplate.query(select1);
 
-        assertThat(resultSet2.all().size(), Is.is(1));
+        assertThat(resultSet1.all().size(), Is.is(1));
 
+        Select select2 = QueryBuilder.select().from("device_notification").where(QueryBuilder.in("device_guid", deviceGuid, deviceGuid2)).limit(10);
+        ResultSet resultSet2 = cqlTemplate.query(select2);
+
+        assertThat(resultSet2.all().size(), Is.is(2));
     }
 
     private void insertEventUsingCqlString() {
@@ -50,13 +54,13 @@ public class CqlTemplateIntegrationTest extends BaseIntegrationTest {
 
     private void insertEventUsingStatementBuildWithQueryBuilder() {
         Insert insertStatement = QueryBuilder.insertInto("device_notification").value("id", String.valueOf(UUIDs.timeBased().timestamp())).value("notification", "notification")
-                .value("device_guid", deviceGuid).value("timestamp", date);
+                .value("device_guid", deviceGuid2).value("timestamp", date);
         cqlTemplate.execute(insertStatement);
     }
 
     private void insertEventUsingPreparedStatement() {
         PreparedStatement preparedStatement = cqlTemplate.getSession().prepare("insert into device_notification (id, notification, device_guid, timestamp) values (?, ?, ?, ?)");
-        Statement insertStatement = preparedStatement.bind(String.valueOf(UUIDs.timeBased().timestamp()), "notification", deviceGuid2, date);
+        Statement insertStatement = preparedStatement.bind(String.valueOf(UUIDs.timeBased().timestamp()), "notification", deviceGuid3, date);
         cqlTemplate.execute(insertStatement);
     }
 }

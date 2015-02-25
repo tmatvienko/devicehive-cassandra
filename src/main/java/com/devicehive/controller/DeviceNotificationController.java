@@ -18,9 +18,10 @@ public class DeviceNotificationController {
     @Autowired
     private DeviceNotificationService notificationService;
 
-    @RequestMapping(value="/all",method = RequestMethod.GET, produces = "application/json")
-    public List<DeviceNotification> getLast(@RequestParam(value = "count", required=false, defaultValue = "1000") int count) {
-        return notificationService.getLast(count);
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public List<DeviceNotification> getLast(@RequestParam(value = "count", required=false, defaultValue = "1000") int count,
+                                            @RequestParam(value = "deviceGuids", required = false) String deviceGuids) {
+        return notificationService.get(count, deviceGuids);
     }
 
     @RequestMapping(value="/{deviceGuid}",method = RequestMethod.GET, produces = "application/json")

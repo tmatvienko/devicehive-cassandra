@@ -5,11 +5,11 @@ import com.datastax.driver.core.querybuilder.Select;
 import com.devicehive.domain.DeviceNotification;
 import com.devicehive.repository.DeviceNotificationRepository;
 import com.devicehive.utils.mappers.NotificationRowMapper;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,9 +26,13 @@ public class DeviceNotificationService {
     @Autowired
     private DeviceNotificationRepository notificationRepository;
 
-    public List<DeviceNotification> getLast(Integer count) {
-        Select select = QueryBuilder.select().from("device_notification").limit(count);
-        return cqlTemplate.query(select, new NotificationRowMapper());
+    public List<DeviceNotification> get(Integer count, String deviceGuids) {
+        Select select = QueryBuilder.select().from("device_notification");
+        if (StringUtils.isNotBlank(deviceGuids)) {
+            String[] guids = StringUtils.split(StringUtils.deleteWhitespace(deviceGuids), ',');
+            select.where(QueryBuilder.in("device_guid", guids));
+        }
+        return cqlTemplate.query(select.limit(count), new NotificationRowMapper());
     }
 
     public List<DeviceNotification> getByDevice(String deviceGuid, Integer count) {

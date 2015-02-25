@@ -50,6 +50,10 @@ public class MessageConsumerGroup implements InitializingBean, DisposableBean {
     private static final String COMMAND_TOPIC_NAME = "command.topic.name";
     private static final String COMMAND_UPDATE_TOPIC_NAME = "command.update.topic.name";
 
+    private static final String NOTIFICATION_GROUP_ID = "cassandra.notification.group";
+    private static final String COMMAND_GROUP_ID = "cassandra.command.group";
+    private static final String COMMAND_UPDATE_GROUP_ID = "cassandra.command.update.group";
+
     @Autowired
     private Environment environment;
     @Autowired
@@ -63,12 +67,14 @@ public class MessageConsumerGroup implements InitializingBean, DisposableBean {
         ClusterConfig config = cassandraConfiguration.getClusterConfig();
         Properties consumerProperties = new Properties();
         consumerProperties.put(ZOOKEEPER_CONNECT, config.getZookeeperConnect());
-        consumerProperties.put(GROUP_ID, environment.getProperty(GROUP_ID));
         consumerProperties.put(ZOOKEEPER_SESSION_TIMEOUT_MS, environment.getProperty(ZOOKEEPER_SESSION_TIMEOUT_MS));
         consumerProperties.put(ZOOKEEPER_SYNC_TIME_MS, environment.getProperty(ZOOKEEPER_SYNC_TIME_MS));
         consumerProperties.put(AUTO_COMMIT_INTERVAL_MS, environment.getProperty(AUTO_COMMIT_INTERVAL_MS));
+        consumerProperties.put(GROUP_ID, NOTIFICATION_GROUP_ID);
         this.notificationConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(consumerProperties));
+        consumerProperties.setProperty(GROUP_ID, COMMAND_GROUP_ID);
         this.commandConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(consumerProperties));
+        consumerProperties.setProperty(GROUP_ID, COMMAND_UPDATE_GROUP_ID);
         this.commandUpdateConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(consumerProperties));
         LOGGER.info("Notification consumer config: {}", consumerProperties);
 
