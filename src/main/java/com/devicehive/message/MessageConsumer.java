@@ -4,6 +4,7 @@ import com.devicehive.domain.DeviceCommand;
 import com.devicehive.domain.DeviceNotification;
 import com.devicehive.domain.wrappers.DeviceCommandWrapper;
 import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
+import com.devicehive.service.DeviceCommandsService;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ public class MessageConsumer {
 
     @Autowired
     private CassandraOperations cassandraTemplate;
+    @Autowired
+    private DeviceCommandsService commandService;
 
     @Async
     public void subscribeOnNotifications(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
@@ -44,6 +47,7 @@ public class MessageConsumer {
             DeviceCommandWrapper message = it.next().message();
             LOGGER.debug("Command {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
             DeviceCommand command = new DeviceCommand(message);
+            command.setIsUpdated(false);
             cassandraTemplate.insert(command);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);
@@ -51,13 +55,13 @@ public class MessageConsumer {
 
     @Async
     public void subscribeOnCommandsUpdate(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
-        LOGGER.info("{}: Kafka device commands update consumer started... {} ", Thread.currentThread().getName(), a_threadNumber);
+        LOGGER.info("{}: Kafka device command update consumer started... {} ", Thread.currentThread().getName(), a_threadNumber);
         ConsumerIterator<String, DeviceCommandWrapper> it = a_stream.iterator();
         while (it.hasNext()) {
             DeviceCommandWrapper message = it.next().message();
             LOGGER.debug("CommandUpdate {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
             DeviceCommand command = new DeviceCommand(message);
-            cassandraTemplate.updateAsynchronously(command);
+            commandService.updateDeviceCommmand(command);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);
     }

@@ -4,7 +4,7 @@ import com.devicehive.domain.JsonStringWrapper;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 
 /**
  * Created by tmatvienko on 2/24/15.
@@ -12,13 +12,13 @@ import java.util.Date;
 public class DeviceNotificationWrapper implements Serializable {
 
     @SerializedName("id")
-    private final String id;
+    private final Long id;
 
     @SerializedName("device_guid")
     private final String deviceGuid;
 
     @SerializedName("timestamp")
-    private final Date timestamp;
+    private final Timestamp timestamp;
 
     @SerializedName("notification")
     private final String notification;
@@ -26,7 +26,7 @@ public class DeviceNotificationWrapper implements Serializable {
     @SerializedName("parameters")
     private final JsonStringWrapper parameters;
 
-    public DeviceNotificationWrapper(String id, String deviceGuid, Date timestamp, String notification, JsonStringWrapper parameters) {
+    public DeviceNotificationWrapper(Long id, String deviceGuid, Timestamp timestamp, String notification, JsonStringWrapper parameters) {
         this.id = id;
         this.deviceGuid = deviceGuid;
         this.timestamp = timestamp;
@@ -34,7 +34,7 @@ public class DeviceNotificationWrapper implements Serializable {
         this.parameters= parameters;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -46,7 +46,7 @@ public class DeviceNotificationWrapper implements Serializable {
         return deviceGuid;
     }
 
-    public Date getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 

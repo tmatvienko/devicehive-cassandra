@@ -1,5 +1,7 @@
 package com.devicehive.service;
 
+import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.Delete;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.devicehive.domain.DeviceNotification;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,18 +22,28 @@ import java.util.List;
 @Service
 public class DeviceNotificationService {
 
-    private static final Integer DEFAULT_MAX_COUNT = 100;
+    private static final Integer DEFAULT_MAX_COUNT = 1000;
 
     @Autowired
     private CqlOperations cqlTemplate;
     @Autowired
     private DeviceNotificationRepository notificationRepository;
 
-    public List<DeviceNotification> get(Integer count, String deviceGuids) {
-        Select select = QueryBuilder.select().from("device_notification");
+    public List<DeviceNotification> get(Integer count, String deviceGuids, Date timestamp) {
+        Select.Where select = QueryBuilder.select().from("device_notification").where();
+        List<Clause> clauses = new ArrayList<>();
         if (StringUtils.isNotBlank(deviceGuids)) {
             String[] guids = StringUtils.split(StringUtils.deleteWhitespace(deviceGuids), ',');
-            select.where(QueryBuilder.in("device_guid", guids));
+            clauses.add(QueryBuilder.in("device_guid", guids));
+        }
+        if (timestamp != null) {
+            clauses.add(QueryBuilder.gte("timestamp", timestamp));
+        }
+        if (count == null) {
+            count = DEFAULT_MAX_COUNT;
+        }
+        for (Clause clause : clauses) {
+            select.and(clause);
         }
         return cqlTemplate.query(select.limit(count), new NotificationRowMapper());
     }
@@ -48,7 +61,13 @@ public class DeviceNotificationService {
         return notificationRepository.count();
     }
 
-    public List<DeviceNotification> getNewNotifications(Date date) {
-        return (List<DeviceNotification>) notificationRepository.findByTimestamp(date);
+    public void deleteAllNotifications() {
+        notificationRepository.deleteAll();
+    }
+
+    public void deleteByDeviceGuid(String deviceGuid) {
+        Delete delete = QueryBuilder.delete().from("device_notification").where(QueryBuilder.eq("device_guid",
+                deviceGuid)).ifExists();
+        cqlTemplate.execute(delete);
     }
 }

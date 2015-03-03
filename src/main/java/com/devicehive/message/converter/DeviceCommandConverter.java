@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 public class DeviceCommandConverter implements Encoder<DeviceCommand>, Decoder<DeviceCommandWrapper> {
     private Gson gson;
     public DeviceCommandConverter(VerifiableProperties verifiableProperties) {
-        gson = new GsonBuilder().disableHtmlEscaping().create();
+        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").disableHtmlEscaping().create();
     }
 
     @Override

@@ -12,8 +12,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 
-import java.text.SimpleDateFormat;
-
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -23,7 +22,6 @@ public class CqlTemplateIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private CqlOperations cqlTemplate;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm");
 
     @Test
     public void supportsPojoToCqlMappings() {
@@ -45,6 +43,25 @@ public class CqlTemplateIntegrationTest extends BaseIntegrationTest {
         ResultSet resultSet2 = cqlTemplate.query(select2);
 
         assertThat(resultSet2.all().size(), Is.is(2));
+    }
+
+    @Test
+    public void updatePojoToCqlMappings() {
+        final String commandId = String.valueOf(UUIDs.timeBased().timestamp());
+        cqlTemplate.execute("insert into device_command (id, command, device_guid, timestamp) values ('" +
+                commandId + "', 'command', '" + deviceGuid + "', '" + date.getTime() + "')");
+        ResultSet resultSet = cqlTemplate.query("select * from device_command where device_guid='" + deviceGuid + "'");
+        assertThat(resultSet.all().size(), Is.is(1));
+
+        Statement update = QueryBuilder.update("device_command").with(QueryBuilder.set("result", "success"))
+                .and(QueryBuilder.set("command", "COMMAND")).where(QueryBuilder.eq("id", commandId)).and(QueryBuilder.eq("device_guid", deviceGuid2));
+        cqlTemplate.execute(update);
+
+        resultSet = cqlTemplate.query("select * from device_command where device_guid='" + deviceGuid2 + "'");
+        assertEquals(resultSet.one().getString("command"), "COMMAND");
+
+        resultSet = cqlTemplate.query("select * from device_command where device_guid='" + deviceGuid + "'");
+        assertThat(resultSet.all().size(), Is.is(1));
     }
 
     private void insertEventUsingCqlString() {

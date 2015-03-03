@@ -44,6 +44,7 @@ public class MessageConsumerGroup implements InitializingBean, DisposableBean {
     private static final String ZOOKEEPER_CONNECT = "zookeeper.connect";
     private static final String GROUP_ID = "group.id";
     private static final String ZOOKEEPER_SESSION_TIMEOUT_MS = "zookeeper.session.timeout.ms";
+    private static final String ZOOKEEPER_CONNECTION_TIMEOUT_MS = "zookeeper.connection.timeout.ms";
     private static final String ZOOKEEPER_SYNC_TIME_MS = "zookeeper.sync.time.ms";
     private static final String AUTO_COMMIT_INTERVAL_MS = "auto.commit.interval.ms";
     private static final String NOTIFICATION_TOPIC_NAME = "notification.topic.name";
@@ -68,6 +69,7 @@ public class MessageConsumerGroup implements InitializingBean, DisposableBean {
         Properties consumerProperties = new Properties();
         consumerProperties.put(ZOOKEEPER_CONNECT, config.getZookeeperConnect());
         consumerProperties.put(ZOOKEEPER_SESSION_TIMEOUT_MS, environment.getProperty(ZOOKEEPER_SESSION_TIMEOUT_MS));
+        consumerProperties.put(ZOOKEEPER_CONNECTION_TIMEOUT_MS, environment.getProperty(ZOOKEEPER_CONNECTION_TIMEOUT_MS));
         consumerProperties.put(ZOOKEEPER_SYNC_TIME_MS, environment.getProperty(ZOOKEEPER_SYNC_TIME_MS));
         consumerProperties.put(AUTO_COMMIT_INTERVAL_MS, environment.getProperty(AUTO_COMMIT_INTERVAL_MS));
         consumerProperties.put(GROUP_ID, NOTIFICATION_GROUP_ID);

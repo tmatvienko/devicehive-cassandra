@@ -41,7 +41,7 @@ public class DeviceNotification implements Serializable {
 
     public DeviceNotification(DeviceNotificationWrapper wrapper) {
         if (wrapper.getId() != null) {
-            this.id = wrapper.getId();
+            this.id = wrapper.getId().toString();
         }
         if (wrapper.getDeviceGuid() != null) {
             this.deviceGuid = wrapper.getDeviceGuid();

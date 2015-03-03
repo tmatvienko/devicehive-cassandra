@@ -3,6 +3,7 @@ package com.devicehive.domain;
 import com.devicehive.domain.wrappers.DeviceCommandWrapper;
 import org.springframework.cassandra.core.Ordering;
 import org.springframework.cassandra.core.PrimaryKeyType;
+import org.springframework.data.cassandra.mapping.Column;
 import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.mapping.Table;
 
@@ -15,13 +16,12 @@ import java.util.Date;
 @Table(value = "device_command")
 public class DeviceCommand implements Serializable {
 
-    @PrimaryKeyColumn(name = "id", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+    @PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private String id;
 
     @PrimaryKeyColumn(name = "device_guid", ordinal = 0, type = PrimaryKeyType.PARTITIONED, ordering = Ordering.DESCENDING)
     private String deviceGuid;
 
-    @PrimaryKeyColumn(name = "timestamp", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Date timestamp;
 
     private String command;
@@ -38,10 +38,13 @@ public class DeviceCommand implements Serializable {
 
     private String result;
 
+    @Column("updated")
+    private Boolean isUpdated;
+
     public DeviceCommand() {
     }
 
-    public DeviceCommand(String id, String deviceGuid, Date timestamp, String command, String parameters, String userId, Integer lifetime, Integer flags, String status, String result) {
+    public DeviceCommand(String id, String deviceGuid, Date timestamp, String command, String parameters, String userId, Integer lifetime, Integer flags, String status, String result, Boolean isUpdated) {
         this.id = id;
         this.deviceGuid = deviceGuid;
         this.timestamp = timestamp;
@@ -52,11 +55,12 @@ public class DeviceCommand implements Serializable {
         this.flags = flags;
         this.status = status;
         this.result = result;
+        this.isUpdated = isUpdated;
     }
 
     public DeviceCommand(DeviceCommandWrapper wrapper) {
         if (wrapper.getId() != null) {
-            this.id = wrapper.getId();
+            this.id = wrapper.getId().toString();
         }
         if (wrapper.getDeviceGuid() != null) {
             this.deviceGuid = wrapper.getDeviceGuid();
@@ -71,7 +75,7 @@ public class DeviceCommand implements Serializable {
             this.parameters = wrapper.getParameters().getJsonString();
         }
         if (wrapper.getUserId() != null) {
-            this.userId = wrapper.getUserId();
+            this.userId = wrapper.getUserId().toString();
         }
         if (wrapper.getLifetime() != null) {
             this.lifetime = wrapper.getLifetime();
@@ -127,23 +131,32 @@ public class DeviceCommand implements Serializable {
         return result;
     }
 
+    public Boolean getIsUpdated() {
+        return isUpdated;
+    }
+
+    public void setIsUpdated(Boolean isUpdated) {
+        this.isUpdated = isUpdated;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DeviceCommand that = (DeviceCommand) o;
+        DeviceCommand command1 = (DeviceCommand) o;
 
-        if (command != null ? !command.equals(that.command) : that.command != null) return false;
-        if (deviceGuid != null ? !deviceGuid.equals(that.deviceGuid) : that.deviceGuid != null) return false;
-        if (flags != null ? !flags.equals(that.flags) : that.flags != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (lifetime != null ? !lifetime.equals(that.lifetime) : that.lifetime != null) return false;
-        if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null) return false;
-        if (result != null ? !result.equals(that.result) : that.result != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-        if (timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null) return false;
-        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+        if (command != null ? !command.equals(command1.command) : command1.command != null) return false;
+        if (deviceGuid != null ? !deviceGuid.equals(command1.deviceGuid) : command1.deviceGuid != null) return false;
+        if (flags != null ? !flags.equals(command1.flags) : command1.flags != null) return false;
+        if (id != null ? !id.equals(command1.id) : command1.id != null) return false;
+        if (isUpdated != null ? !isUpdated.equals(command1.isUpdated) : command1.isUpdated != null) return false;
+        if (lifetime != null ? !lifetime.equals(command1.lifetime) : command1.lifetime != null) return false;
+        if (parameters != null ? !parameters.equals(command1.parameters) : command1.parameters != null) return false;
+        if (result != null ? !result.equals(command1.result) : command1.result != null) return false;
+        if (status != null ? !status.equals(command1.status) : command1.status != null) return false;
+        if (timestamp != null ? !timestamp.equals(command1.timestamp) : command1.timestamp != null) return false;
+        if (userId != null ? !userId.equals(command1.userId) : command1.userId != null) return false;
 
         return true;
     }
@@ -160,6 +173,24 @@ public class DeviceCommand implements Serializable {
         result1 = 31 * result1 + (flags != null ? flags.hashCode() : 0);
         result1 = 31 * result1 + (status != null ? status.hashCode() : 0);
         result1 = 31 * result1 + (result != null ? result.hashCode() : 0);
+        result1 = 31 * result1 + (isUpdated != null ? isUpdated.hashCode() : 0);
         return result1;
+    }
+
+    @Override
+    public String toString() {
+        return "DeviceCommand{" +
+                "id='" + id + '\'' +
+                ", deviceGuid='" + deviceGuid + '\'' +
+                ", timestamp=" + timestamp +
+                ", command='" + command + '\'' +
+                ", parameters='" + parameters + '\'' +
+                ", userId='" + userId + '\'' +
+                ", lifetime=" + lifetime +
+                ", flags=" + flags +
+                ", status='" + status + '\'' +
+                ", result='" + result + '\'' +
+                ", isUpdated=" + isUpdated +
+                '}';
     }
 }

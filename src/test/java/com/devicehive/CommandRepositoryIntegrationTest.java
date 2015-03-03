@@ -22,42 +22,30 @@ public class CommandRepositoryIntegrationTest extends BaseIntegrationTest {
     @Test
     public void repositoryStoresAndRetrievesEvents() {
         final String id = String.valueOf(UUIDs.timeBased().timestamp());
-        final DeviceCommand command1 = new DeviceCommand(id, deviceGuid, date, "command1", null, "0", null, null, null, null);
-        final DeviceCommand command2 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid2, date, "command2", null, "0", null, null, null, null);
+        final DeviceCommand command1 = new DeviceCommand(id, deviceGuid, date, "command1", null, null, null, null, null, null, null);
+        final DeviceCommand command2 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid2, date, "command2", null, null, null, null, null, null, null);
         commandRepository.save(ImmutableSet.of(command1, command2));
 
-        Iterable<DeviceCommand> commands = commandRepository.findByDeviceGuid(deviceGuid);
+        Iterable<DeviceCommand> commands = commandRepository.findByDeviceGuids(deviceGuid);
         assertThat(commands, hasItem(command1));
 
-        commands = commandRepository.findByDeviceGuid(deviceGuid2);
+        commands = commandRepository.findByDeviceGuids(deviceGuid2);
         assertThat(commands, hasItem(command2));
     }
 
     @Test
     public void repositoryDeletesStoredEvents() {
-        final DeviceCommand command1 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid, date, "command", null, "0", null, null, null, null);
-        final DeviceCommand command2 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid2, date, "command", null, "0", null, null, null, null);
+        final DeviceCommand command1 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid, date, "command", null, null, null, null, null, null, null);
+        final DeviceCommand command2 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid2, date, "command", null, null, null, null, null, null, null);
         commandRepository.save(ImmutableSet.of(command1, command2));
 
         commandRepository.delete(command1);
         commandRepository.delete(command2);
 
-        Iterable<DeviceCommand> notifications = commandRepository.findByDeviceGuid(deviceGuid);
+        Iterable<DeviceCommand> notifications = commandRepository.findByDeviceGuids(deviceGuid);
         assertThat(notifications, not(hasItem(command1)));
 
-        notifications = commandRepository.findByDeviceGuid(deviceGuid2);
+        notifications = commandRepository.findByDeviceGuids(deviceGuid2);
         assertThat(notifications, not(hasItem(command2)));
-    }
-
-    @Test
-    public void repositoryStoresAndRetrievesEventsByDate() {
-        final DeviceCommand command1 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid, date, "command", null, "0", null, null, null, null);
-        final DeviceCommand command2 = new DeviceCommand(String.valueOf(UUIDs.timeBased()), deviceGuid, date, "command", null, "0", null, null, null, null);
-        commandRepository.save(ImmutableSet.of(command1, command2));
-
-        Iterable<DeviceCommand> notifications = commandRepository.findByTimestamp(date);
-
-        assertThat(notifications, hasItem(command1));
-        assertThat(notifications, hasItem(command2));
     }
 }
