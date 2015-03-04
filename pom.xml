@@ -155,14 +155,14 @@
 
   <profiles>
     <profile>
-        <id>glassfish</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-        </activation>
-        <properties>
-            <jta.platform>SunOne</jta.platform>
-            <server.log.directory>${com.sun.aas.instanceRoot}/logs</server.log.directory>
-        </properties>
+      <id>glassfish</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <jta.platform>SunOne</jta.platform>
+        <server.log.directory>${com.sun.aas.instanceRoot}/logs</server.log.directory>
+      </properties>
     </profile>
   </profiles>
 
