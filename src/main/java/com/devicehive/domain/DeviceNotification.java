@@ -1,7 +1,6 @@
 package com.devicehive.domain;
 
 import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
-import org.springframework.cassandra.core.Ordering;
 import org.springframework.cassandra.core.PrimaryKeyType;
 import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.mapping.Table;
@@ -15,13 +14,12 @@ import java.util.Date;
 @Table(value = "device_notification")
 public class DeviceNotification implements Serializable {
 
-    @PrimaryKeyColumn(name = "id", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
+    @PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
     private String id;
 
     @PrimaryKeyColumn(name = "device_guid", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
     private String deviceGuid;
 
-    @PrimaryKeyColumn(name = "timestamp", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Date timestamp;
 
     private String notification;

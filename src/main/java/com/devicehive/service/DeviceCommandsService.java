@@ -7,6 +7,7 @@ import com.datastax.driver.core.querybuilder.Update;
 import com.devicehive.domain.DeviceCommand;
 import com.devicehive.domain.wrappers.DeviceCommandWrapper;
 import com.devicehive.repository.DeviceCommandRepository;
+import com.devicehive.utils.MessageUtils;
 import com.devicehive.utils.mappers.CommandRowMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -17,7 +18,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,11 +32,13 @@ public class DeviceCommandsService {
     private CqlOperations cqlTemplate;
     @Autowired
     private DeviceCommandRepository commandRepository;
+    @Autowired
+    private MessageUtils messageUtils;
 
     public List<DeviceCommandWrapper> get(Integer count, String commandId, String deviceGuids, final Timestamp timestamp) {
         Select.Where select = QueryBuilder.select().from("device_command").where();
         if (StringUtils.isNotBlank(deviceGuids)) {
-            select.and(QueryBuilder.in("device_guid", getDeviceGuids(deviceGuids)));
+            select.and(QueryBuilder.in("device_guid", messageUtils.getDeviceGuids(deviceGuids)));
         }
         if (StringUtils.isNotBlank(commandId)) {
             select.and(QueryBuilder.in("id", commandId));
@@ -87,12 +89,8 @@ public class DeviceCommandsService {
     public void delete(String deviceGuids) {
         Delete.Where delete = QueryBuilder.delete().from("device_command").where();
         if (StringUtils.isNotEmpty(deviceGuids)) {
-            delete.and(QueryBuilder.in("device_guid", getDeviceGuids(deviceGuids)));
+            delete.and(QueryBuilder.in("device_guid", messageUtils.getDeviceGuids(deviceGuids)));
         }
         cqlTemplate.execute(delete);
-    }
-
-    private String[] getDeviceGuids(final String deviceGuids) {
-        return StringUtils.split(StringUtils.deleteWhitespace(deviceGuids), ',');
     }
 }

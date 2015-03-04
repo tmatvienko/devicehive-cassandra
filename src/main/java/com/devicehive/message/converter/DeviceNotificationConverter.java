@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 public class DeviceNotificationConverter implements Encoder<DeviceNotification>, Decoder<DeviceNotificationWrapper> {
     private Gson gson;
     public DeviceNotificationConverter(VerifiableProperties verifiableProperties) {
-        gson = new GsonBuilder().disableHtmlEscaping().create();
+        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").disableHtmlEscaping().create();
     }
 
     @Override

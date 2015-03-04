@@ -1,19 +1,22 @@
 package com.devicehive.service;
 
-import com.datastax.driver.core.querybuilder.Clause;
 import com.datastax.driver.core.querybuilder.Delete;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
-import com.devicehive.domain.DeviceNotification;
+import com.devicehive.domain.wrappers.DeviceCommandWrapper;
+import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
 import com.devicehive.repository.DeviceNotificationRepository;
+import com.devicehive.utils.MessageUtils;
 import com.devicehive.utils.mappers.NotificationRowMapper;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -28,46 +31,42 @@ public class DeviceNotificationService {
     private CqlOperations cqlTemplate;
     @Autowired
     private DeviceNotificationRepository notificationRepository;
+    @Autowired
+    private MessageUtils messageUtils;
 
-    public List<DeviceNotification> get(Integer count, String deviceGuids, Date timestamp) {
+    public List<DeviceNotificationWrapper> get(Integer count, String commandId, String deviceGuids, final Timestamp timestamp) {
         Select.Where select = QueryBuilder.select().from("device_notification").where();
-        List<Clause> clauses = new ArrayList<>();
         if (StringUtils.isNotBlank(deviceGuids)) {
-            String[] guids = StringUtils.split(StringUtils.deleteWhitespace(deviceGuids), ',');
-            clauses.add(QueryBuilder.in("device_guid", guids));
+            select.and(QueryBuilder.in("device_guid", messageUtils.getDeviceGuids(deviceGuids)));
         }
+        if (StringUtils.isNotBlank(commandId)) {
+            select.and(QueryBuilder.in("id", commandId));
+        }
+        if (count == null) {
+            count = DEFAULT_MAX_COUNT;
+        }
+        List<DeviceNotificationWrapper> commands = cqlTemplate.query(select.limit(count).allowFiltering(), new NotificationRowMapper());
         if (timestamp != null) {
-            clauses.add(QueryBuilder.gte("timestamp", timestamp));
+            CollectionUtils.filter(commands, new Predicate() {
+                @Override
+                public boolean evaluate(Object o) {
+                    return timestamp.before(((DeviceNotificationWrapper) o).getTimestamp());
+                }
+            });
         }
-        if (count == null) {
-            count = DEFAULT_MAX_COUNT;
-        }
-        for (Clause clause : clauses) {
-            select.and(clause);
-        }
-        return cqlTemplate.query(select.limit(count), new NotificationRowMapper());
-    }
-
-    public List<DeviceNotification> getByDevice(String deviceGuid, Integer count) {
-        if (count == null) {
-            count = DEFAULT_MAX_COUNT;
-        }
-        Select select = QueryBuilder.select().from("device_notification").where(QueryBuilder.eq("device_guid",
-                deviceGuid)).limit(count);
-        return cqlTemplate.query(select, new NotificationRowMapper());
+        return commands;
     }
 
     public Long getNotificationsCount() {
         return notificationRepository.count();
     }
 
-    public void deleteAllNotifications() {
-        notificationRepository.deleteAll();
-    }
-
-    public void deleteByDeviceGuid(String deviceGuid) {
-        Delete delete = QueryBuilder.delete().from("device_notification").where(QueryBuilder.eq("device_guid",
-                deviceGuid)).ifExists();
+    @Async
+    public void delete(String deviceGuids) {
+        Delete.Where delete = QueryBuilder.delete().from("device_command").where();
+        if (StringUtils.isNotEmpty(deviceGuids)) {
+            delete.and(QueryBuilder.in("device_guid", messageUtils.getDeviceGuids(deviceGuids)));
+        }
         cqlTemplate.execute(delete);
     }
 }

@@ -1,7 +1,9 @@
 package com.devicehive.domain.wrappers;
 
 import com.devicehive.domain.JsonStringWrapper;
+import com.devicehive.message.converter.adapter.TimestampAdapter;
 import com.google.gson.annotations.SerializedName;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -12,19 +14,22 @@ import java.sql.Timestamp;
 public class DeviceNotificationWrapper implements Serializable {
 
     @SerializedName("id")
-    private final Long id;
+    private Long id;
 
-    @SerializedName("device_guid")
-    private final String deviceGuid;
+    @SerializedName("deviceGuid")
+    private String deviceGuid;
 
     @SerializedName("timestamp")
-    private final Timestamp timestamp;
+    private Timestamp timestamp;
 
     @SerializedName("notification")
-    private final String notification;
+    private String notification;
 
     @SerializedName("parameters")
-    private final JsonStringWrapper parameters;
+    private JsonStringWrapper parameters;
+
+    public DeviceNotificationWrapper() {
+    }
 
     public DeviceNotificationWrapper(Long id, String deviceGuid, Timestamp timestamp, String notification, JsonStringWrapper parameters) {
         this.id = id;
@@ -46,12 +51,33 @@ public class DeviceNotificationWrapper implements Serializable {
         return deviceGuid;
     }
 
+    @JsonSerialize(using=TimestampAdapter.class)
     public Timestamp getTimestamp() {
         return timestamp;
     }
 
     public JsonStringWrapper getParameters() {
         return parameters;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDeviceGuid(String deviceGuid) {
+        this.deviceGuid = deviceGuid;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setNotification(String notification) {
+        this.notification = notification;
+    }
+
+    public void setParameters(JsonStringWrapper parameters) {
+        this.parameters = parameters;
     }
 
     @Override

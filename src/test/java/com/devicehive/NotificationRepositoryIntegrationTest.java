@@ -8,8 +8,10 @@ import org.apache.commons.lang.time.DateUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.cassandra.core.CassandraOperations;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -24,18 +26,27 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private DeviceNotificationRepository notificationRepository;
+    @Autowired
+    private CassandraOperations cassandraTemplate;
 
     @Test
     public void repositoryStoresAndRetrievesEvents() {
         final String id = String.valueOf(UUIDs.timeBased().timestamp());
         final DeviceNotification notif1 = new DeviceNotification(id, deviceGuid, date, "notification1", null);
-        final DeviceNotification notif2 = new DeviceNotification(String.valueOf(UUIDs.timeBased()), deviceGuid2, date, "notification2", null);
-        notificationRepository.save(ImmutableSet.of(notif1, notif2));
+        final DeviceNotification notif2 = new DeviceNotification(String.valueOf(UUIDs.timeBased().timestamp()), deviceGuid2, date, "notification2", null);
+        cassandraTemplate.insertAsynchronously(notif1);
+        cassandraTemplate.insertAsynchronously(notif2);
 
-        Iterable<DeviceNotification> notifications = notificationRepository.findByTimestamp(date);
+        Iterable<DeviceNotification> notifications = notificationRepository.findByDeviceGuid(deviceGuid);
 
         assertThat(notifications, hasItem(notif1));
+        assertThat(notifications, not(hasItem(notif2)));
+
+        notifications = notificationRepository.findByDeviceGuid(deviceGuid2);
+
         assertThat(notifications, hasItem(notif2));
+        assertThat(notifications, not(hasItem(notif1)));
+
     }
 
     @Test
@@ -51,41 +62,5 @@ public class NotificationRepositoryIntegrationTest extends BaseIntegrationTest {
 
         assertThat(notifications, not(hasItem(notif1)));
         assertThat(notifications, not(hasItem(notif2)));
-    }
-
-    @Test
-    public void repositoryStoresAndRetrievesEventsByDate() {
-        final DeviceNotification notif1 = new DeviceNotification(String.valueOf(UUIDs.timeBased()), deviceGuid, date, "notification1", null);
-        final DeviceNotification notif2 = new DeviceNotification(String.valueOf(UUIDs.timeBased()), deviceGuid2, date, "notification1", null);
-        notificationRepository.save(ImmutableSet.of(notif1, notif2));
-
-        Iterable<DeviceNotification> notifications = notificationRepository.findByTimestamp(date);
-
-        assertThat(notifications, hasItem(notif1));
-        assertThat(notifications, hasItem(notif2));
-    }
-
-    @Test
-    public void repositoryStoresAndRetrievesEventsByDates() {
-        final Long curMillis = System.currentTimeMillis();
-        final Timestamp date1 = new Timestamp(curMillis);
-        final Timestamp date2 = new Timestamp(curMillis + 1000);
-        final Timestamp date3 = new Timestamp(curMillis + 10000);
-        final DeviceNotification notif1 = new DeviceNotification(String.valueOf(UUIDs.timeBased()), deviceGuid, date1, "notification1", null);
-        final DeviceNotification notif2 = new DeviceNotification(String.valueOf(UUIDs.timeBased()), deviceGuid2, date2, "notification1", null);
-        final DeviceNotification notif3 = new DeviceNotification(String.valueOf(UUIDs.timeBased()), deviceGuid2, date3, "notification1", null);
-        notificationRepository.save(ImmutableSet.of(notif1, notif2, notif3));
-
-        Iterable<DeviceNotification> notifications = notificationRepository.findInPeriod(date1, date2);
-
-        assertThat(notifications, hasItem(notif1));
-        assertThat(notifications, hasItem(notif2));
-        assertThat(notifications, not(hasItem(notif3)));
-
-        notifications = notificationRepository.findInPeriod(date2, date3);
-
-        assertThat(notifications, not(hasItem(notif1)));
-        assertThat(notifications, hasItem(notif2));
-        assertThat(notifications, hasItem(notif3));
     }
 }
