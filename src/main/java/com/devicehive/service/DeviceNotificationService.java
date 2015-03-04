@@ -25,8 +25,6 @@ import java.util.List;
 @Service
 public class DeviceNotificationService {
 
-    private static final Integer DEFAULT_MAX_COUNT = 1000;
-
     @Autowired
     private CqlOperations cqlTemplate;
     @Autowired
@@ -34,7 +32,7 @@ public class DeviceNotificationService {
     @Autowired
     private MessageUtils messageUtils;
 
-    public List<DeviceNotificationWrapper> get(Integer count, String commandId, String deviceGuids, final Timestamp timestamp) {
+    public List<DeviceNotificationWrapper> get(int count, final String commandId, final String deviceGuids, final String notificationNames, final Timestamp timestamp) {
         Select.Where select = QueryBuilder.select().from("device_notification").where();
         if (StringUtils.isNotBlank(deviceGuids)) {
             select.and(QueryBuilder.in("device_guid", messageUtils.getDeviceGuids(deviceGuids)));
@@ -42,19 +40,24 @@ public class DeviceNotificationService {
         if (StringUtils.isNotBlank(commandId)) {
             select.and(QueryBuilder.in("id", commandId));
         }
-        if (count == null) {
-            count = DEFAULT_MAX_COUNT;
-        }
-        List<DeviceNotificationWrapper> commands = cqlTemplate.query(select.limit(count).allowFiltering(), new NotificationRowMapper());
+        List<DeviceNotificationWrapper> notifications = cqlTemplate.query(select.limit(count).allowFiltering(), new NotificationRowMapper());
         if (timestamp != null) {
-            CollectionUtils.filter(commands, new Predicate() {
+            CollectionUtils.filter(notifications, new Predicate() {
                 @Override
                 public boolean evaluate(Object o) {
                     return timestamp.before(((DeviceNotificationWrapper) o).getTimestamp());
                 }
             });
         }
-        return commands;
+        if (StringUtils.isNotBlank(notificationNames)) {
+            CollectionUtils.filter(notifications, new Predicate() {
+                @Override
+                public boolean evaluate(Object o) {
+                    return notificationNames.contains(((DeviceNotificationWrapper) o).getNotification());
+                }
+            });
+        }
+        return notifications;
     }
 
     public Long getNotificationsCount() {

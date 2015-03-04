@@ -24,9 +24,7 @@ import java.util.List;
  * Created by tmatvienko on 2/13/15.
  */
 @Service
-public class DeviceCommandsService {
-
-    private static final Integer DEFAULT_MAX_COUNT = 1000;
+public class DeviceCommandService {
 
     @Autowired
     private CqlOperations cqlTemplate;
@@ -35,7 +33,7 @@ public class DeviceCommandsService {
     @Autowired
     private MessageUtils messageUtils;
 
-    public List<DeviceCommandWrapper> get(Integer count, String commandId, String deviceGuids, final Timestamp timestamp) {
+    public List<DeviceCommandWrapper> get(int count, final String commandId, final String deviceGuids, final String commandNames, final Timestamp timestamp) {
         Select.Where select = QueryBuilder.select().from("device_command").where();
         if (StringUtils.isNotBlank(deviceGuids)) {
             select.and(QueryBuilder.in("device_guid", messageUtils.getDeviceGuids(deviceGuids)));
@@ -43,15 +41,20 @@ public class DeviceCommandsService {
         if (StringUtils.isNotBlank(commandId)) {
             select.and(QueryBuilder.in("id", commandId));
         }
-        if (count == null) {
-            count = DEFAULT_MAX_COUNT;
-        }
         List<DeviceCommandWrapper> commands = cqlTemplate.query(select.limit(count).allowFiltering(), new CommandRowMapper());
         if (timestamp != null) {
             CollectionUtils.filter(commands, new Predicate() {
                 @Override
                 public boolean evaluate(Object o) {
                     return timestamp.before(((DeviceCommandWrapper) o).getTimestamp());
+                }
+            });
+        }
+        if (StringUtils.isNotEmpty(commandNames)) {
+            CollectionUtils.filter(commands, new Predicate() {
+                @Override
+                public boolean evaluate(Object o) {
+                    return commandNames.contains(((DeviceCommandWrapper) o).getCommand());
                 }
             });
         }
@@ -63,7 +66,7 @@ public class DeviceCommandsService {
     }
 
     @Async
-    public void updateDeviceCommmand(DeviceCommand command) {
+    public void updateDeviceCommmand(final DeviceCommand command) {
         Update.Assignments update = QueryBuilder.update("device_command").with();
         if (command.getCommand() != null) {
             update.and(QueryBuilder.set("command", command.getCommand()));

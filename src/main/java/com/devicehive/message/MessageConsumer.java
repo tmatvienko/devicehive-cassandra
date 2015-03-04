@@ -4,7 +4,7 @@ import com.devicehive.domain.DeviceCommand;
 import com.devicehive.domain.DeviceNotification;
 import com.devicehive.domain.wrappers.DeviceCommandWrapper;
 import com.devicehive.domain.wrappers.DeviceNotificationWrapper;
-import com.devicehive.service.DeviceCommandsService;
+import com.devicehive.service.DeviceCommandService;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class MessageConsumer {
     @Autowired
     private CassandraOperations cassandraTemplate;
     @Autowired
-    private DeviceCommandsService commandService;
+    private DeviceCommandService commandService;
 
     @Async
     public void subscribeOnNotifications(KafkaStream a_stream, int a_threadNumber) throws InterruptedException {
@@ -33,7 +33,7 @@ public class MessageConsumer {
         while (it.hasNext()) {
             DeviceNotificationWrapper message = it.next().message();
             LOGGER.debug("Notification {}: Thread {}: {}", Thread.currentThread().getName(), a_threadNumber, message);
-            DeviceNotification notification = new DeviceNotification(message);
+            final DeviceNotification notification = new DeviceNotification(message);
             cassandraTemplate.insertAsynchronously(notification);
         }
         LOGGER.info("Shutting down Thread: " + a_threadNumber);

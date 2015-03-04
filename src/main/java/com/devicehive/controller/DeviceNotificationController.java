@@ -23,11 +23,12 @@ public class DeviceNotificationController {
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public List<DeviceNotificationWrapper> get(@RequestParam(value = "count", required=false, defaultValue = "1000") int count,
-                                          @RequestParam(value = "id", required = false) String id,
+                                          @RequestParam(value = "id", required = false) final String id,
                                           @RequestParam(value = "deviceGuids", required = false) String deviceGuids,
+                                          @RequestParam(value = "names", required = false) String notificationNames,
                                           @RequestParam(value = "timestamp", required = false) String timestamp) {
         final Timestamp date = timestampAdapter.parseTimestamp(timestamp);
-        return notificationService.get(count, id, deviceGuids, date);
+        return notificationService.get(count, id, deviceGuids, notificationNames, date);
     }
 
     @RequestMapping(value="/count", method = RequestMethod.GET, produces = "application/json")
